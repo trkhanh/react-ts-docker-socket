@@ -19,16 +19,20 @@
   "license": "ISC",
   "dependencies": {
     "classnames": "^2.2.6",
+    "dockerode": "^2.5.5",
     "express": "^4.16.3",
     "lodash": "^4.17.10",
     "nodemon": "^1.17.5",
+    "socket.io": "^2.1.1",
     "typescript": "^2.9.2"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.109",
     "@types/classnames": "^2.2.4",
+    "@types/lodash": "^4.14.109",
     "@types/react": "^16.3.17",
     "@types/react-dom": "^16.0.6",
+    "@types/socket.io": "^1.4.35",
+    "@types/socket.io-client": "^1.4.32",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "source-map-loader": "^0.2.3",

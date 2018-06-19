@@ -1,48 +1,57 @@
 import * as React from 'react'
-import { Container, ContainerListItem } from './containerListItem'
+import { ContainerListItem, Container } from './containerListItem'
 import { ContainerList } from './containerList'
+
 import * as _ from 'lodash'
+import * as io from 'socket.io-client'
+let socket = io.connect()
 
 class AppState {
     containers?: Container[]
     stoppedContainers?: Container[]
 }
+
 // class React.Component<P = {}, S = {}, SS = any>
 export class AppComponent extends React.Component<{}, AppState> {
+
     constructor() {
         super()
-
-        const partitioned = _.partition(this.containers, (c: Container) => c.state == 'running')
-
         this.state = {
-            containers: partitioned[0],
-            stoppedContainers: partitioned[1]
+            containers: [],
+            stoppedContainers: []
         }
+
+        //Listening for "containers.list" 
+        //using socket.on(string, callback()) 
+        //callback= handlerFunction(containers: any){ }
+
+        socket.on('containers.list', (containers: any) => {
+
+            const partitioned = _.partition(containers, (c: Container) => c.state == 'running')
+            
+            this.state = {
+                containers: partitioned[0].map(this.mapContainer),
+                stoppedContainers: partitioned[1].map(this.mapContainer)
+            }
+        })
     }
 
-    containers: Container[] = [
-        {
-            id: '1',
-            name: 'test container',
-            image: 'some image',
-            state: 'running',
-            status: 'Running'
-        },
-        {
-            id: '2',
-            name: 'another test container',
-            image: 'some image',
-            state: 'stopped',
-            status: 'Running'
-        },
-        {
-            id: '3',
-            name: 'another test container 1',
-            image: 'some image',
-            state: 'stopped',
-            status: 'Running'
+    componentDidMount() {
+        socket.emit('containers.list');
+    }
+
+    mapContainer(container: any): Container {
+        return {
+            id: container.Id,
+            name: _.chain(container.Names)
+                .map((n: string) => n.substr(1))
+                .join(", ")
+                .value(),
+            state: container.State,
+            status: `${container.State} (${container.Status})`,
+            image: container.Image
         }
-    ]
+    }
 
     render() {
         return (
